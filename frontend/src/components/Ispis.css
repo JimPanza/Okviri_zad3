@@ -1,0 +1,35 @@
+.Prihod{
+    background-color: #C6FFB7;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.Rashod{
+    background-color: #FCCCCC;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.Rashodiznos{
+    background-color: #FF6D62;
+    padding-left: 5px;
+}
+
+.Prihodiznos{
+    background-color:#7FDC96;
+    padding-left: 5px;
+}
+
+.edit{
+    margin-top: 4px;
+    padding: 3px;
+    display: flex;
+}
+
+.edit > input{
+    width: 75px;
+}
+
+.editDelete > button{
+    margin: 5px;
+}
