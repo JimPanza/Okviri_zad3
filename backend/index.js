@@ -20,30 +20,44 @@ app.get('/api/transakcije', (req, res) => {
     })
 })
 
-app.get('/api/transakcije/:id', (req, res) => {
+app.get('/api/transakcije/:id', (req, res, next) => {
     Transakcija.findById(req.params.id)
         .then(rezultat => {
-            res.json(rezul)
+            if (rezultat) {
+                res.json(rezultat)
+            } else {
+                res.status(404).end()
+            }
         })
+        .catch(error => {
+            next(error)
+        })
+
 })
 
 
-app.delete('/api/transakcije/:id', (req, res) => {
-    const id = Number(req.params.id)
-    console.log("Brisem poruku sa ID:", id);
-    poruke = poruke.filter(p => p.id !== id)
-
+app.delete('/api/transakcije/:id', (req, res, next) => {
+    Transakcija.findByIdAndRemove(req.params.id)
+    .then(result => {
     res.status(204).end()
-})
+    })
+    .catch(err => next(err))
+   })
 
 app.put('/api/transakcije/:id', (req, res) => {
-
     const podatak = req.body
-    const id = Number(req.params.id)
-    console.log("Promjena iznosa transakcije sa id: ", id)
-    poruke = poruke.map(p => p.id !== id ? p : podatak)
-    res.json(podatak)
-})
+    const id = req.params.id
+
+    const poruka = {
+    iznos: podatak.iznos
+    }
+    Transakcija.findByIdAndUpdate(id, poruka, {new: true})
+    .then( novaPoruka => {
+    res.json(novaPoruka)
+    })
+    .catch(err => next(err))
+   })
+   
 
 app.post('/api/transakcije', (req, res) => {
 
@@ -66,12 +80,27 @@ app.post('/api/transakcije', (req, res) => {
     })
 })
 
-const generirajId = () => {
+/* const generirajId = () => {
     const maxId = poruke.length > 0
         ? Math.max(...poruke.map(p => p.id))
         : 0
     return maxId + 1
+} */
+
+const errorHandler = (err, req, res, next) => {
+    console.log(err.message);
+    if (err.name === 'CastError') {
+        return res.status(400).send({ error: 'krivi format ID-a' })
+    }
+    next(err)
 }
+
+function zadnjiErrorHandler(err, req, res, next) {
+    res.status(500).send('error', { error: err })
+}
+
+app.use(errorHandler)
+app.use(zadnjiErrorHandler)
 
 const PORT = 3001
 app.listen(PORT)
