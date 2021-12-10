@@ -4,11 +4,10 @@ let poruke = [
 
 const express = require('express')
 const cors = require('cors')
-
 const app = express()
 app.use(cors())
 app.use(express.json())
-
+const Transakcija = require("./models/transakcija")
 
 
 app.get('/', (req, res) => {
@@ -16,14 +15,18 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/transakcije', (req, res) => {
-    res.json(poruke)
+    Transakcija.find({}).then(rezultat => {
+        res.json(rezultat)
+    })
 })
 
 app.get('/api/transakcije/:id', (req, res) => {
-    const id = req.params.id
-    const poruka = poruke.find(p => p.id === id)
-    res.json(poruka)
+    Transakcija.findById(req.params.id)
+        .then(rezultat => {
+            res.json(rezul)
+        })
 })
+
 
 app.delete('/api/transakcije/:id', (req, res) => {
     const id = Number(req.params.id)
@@ -51,16 +54,16 @@ app.post('/api/transakcije', (req, res) => {
         })
     }
 
-    const poruka = {
-        id: generirajId(),
+    const novaTransakcija = new Transakcija({
         vrsta: podatak.vrsta,
         datum: podatak.datum,
         opis: podatak.opis,
         iznos: podatak.iznos,
-    }
-    poruke = poruke.concat(poruka)
-
-    res.json(poruka)
+    })
+    /* poruke = poruke.concat(poruka) */
+    novaTransakcija.save().then(rezultat => {
+        res.json(rezultat)
+    })
 })
 
 const generirajId = () => {
