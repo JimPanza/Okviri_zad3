@@ -16,7 +16,6 @@ mongoose.connect(config.DB_URI,)
   logger.greska("Greška pri spajanju", error.message);
 })
 
-
 app.use(cors())
 app.use(express.json())
 app.use(express.static('build'))

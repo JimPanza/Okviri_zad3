@@ -18,9 +18,12 @@
   "devDependencies": {
     "dotenv": "^10.0.0",
     "jest": "^27.4.4",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "supertest": "^6.1.6"
   },
   "jest": {
-    "testEnvironment": "node"
-    }
+    "testEnvironment": "node",
+    "testTimeout": 10000,
+    "verbose": true
+  }
 }
