@@ -47,8 +47,8 @@ test('Transakcije se vraćaju kao JSON', async () => {
 test('Iznos druge transakcije je 700', async () => {
     const odgovor = await api.get('/api/transakcije')
 
-    const sadrzaj = odgovor.body.map(p => p.iznos)
-    expect(sadrzaj[1] === 400)
+    const sadrzaj = odgovor.body[1].iznos
+    expect(sadrzaj).toBe(700)
 })
 
 test('Dodavanje transakcije bez iznosa', async () => {
