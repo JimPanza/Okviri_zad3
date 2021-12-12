@@ -2,37 +2,16 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const backend = require('../app')
 const Transakcija = require('../models/transakcija')
-
+const pomocni = require('./test_pomocni')
 const api = supertest(backend)
-
-const pocetneTransakcije = [
-    {
-        vrsta: "Prihod",
-        datum: "2021.12.11",
-        opis: "Prva pocetna",
-        iznos: 400
-    },
-    {
-        vrsta: "Rashod",
-        datum: "2021.12.11",
-        opis: "Druga pocetna",
-        iznos: 700
-    },
-    {
-        vrsta: "Prihod",
-        datum: "2021.12.11",
-        opis: "Treca pocetna",
-        iznos: 1000
-    }
-]
 
 beforeEach(async () => {
     await Transakcija.deleteMany({})
-    let novaTransakcija = new Transakcija(pocetneTransakcije[0])
+    let novaTransakcija = new Transakcija(pomocni.pocetneTransakcije[0])
     await novaTransakcija.save()
-    novaTransakcija = new Transakcija(pocetneTransakcije[1])
+    novaTransakcija = new Transakcija(pomocni.pocetneTransakcije[1])
     await novaTransakcija.save()
-    novaTransakcija = new Transakcija(pocetneTransakcije[2])
+    novaTransakcija = new Transakcija(pomocni.pocetneTransakcije[2])
     await novaTransakcija.save()
 })
 
@@ -45,9 +24,9 @@ test('Transakcije se vraćaju kao JSON', async () => {
 })
 
 test('Iznos druge transakcije je 700', async () => {
-    const odgovor = await api.get('/api/transakcije')
+    const odgovor = await pomocni.transakcijeIzBaze()
 
-    const sadrzaj = odgovor.body[1].iznos
+    const sadrzaj = odgovor[1].iznos
     expect(sadrzaj).toBe(700)
 })
 
@@ -61,8 +40,22 @@ test('Dodavanje transakcije bez iznosa', async () => {
         .post('/api/transakcije')
         .send(novaTransakcija)
         .expect(400)
-    const odgovor = await api.get('/api/transakcije')
-    expect(odgovor.body).toHaveLength(pocetneTransakcije.length)
+    const novoDodavanje = await pomocni.transakcijeIzBaze()
+    expect(novoDodavanje).toHaveLength(pomocni.pocetneTransakcije.length)
+})
+
+test('Ispravno brisanje transakcije', async () => {
+    const pocetne = await pomocni.transakcijeIzBaze()
+    const zaBrisanje = pocetne[0]
+    
+    await api
+        .delete(`/api/transakcije/${zaBrisanje.id}`)
+        .expect(204)
+    const zaKraj = await pomocni.transakcijeIzBaze()
+    expect(zaKraj).toHaveLength(pocetne.length - 1)
+    
+    const sadrzaj = zaKraj.map(p => p.opis)
+    expect(sadrzaj).not.toContain(zaBrisanje.opis)
 })
 
 afterAll(() => {
