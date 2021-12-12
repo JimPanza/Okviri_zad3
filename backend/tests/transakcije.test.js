@@ -15,13 +15,18 @@ beforeEach(async () => {
     await novaTransakcija.save()
 })
 
-
 test('Transakcije se vraćaju kao JSON', async () => {
     await api
         .get('/api/transakcije')
         .expect(200)
         .expect('Content-Type', /application\/json/)
 })
+
+test('Dohvaća sve transakcije', async () => {
+    const odgovor = await api.get('/api/transakcije')
+  
+    expect(odgovor.body).toHaveLength(pomocni.pocetneTransakcije.length)
+  })
 
 test('Iznos druge transakcije je 700', async () => {
     const odgovor = await pomocni.transakcijeIzBaze()
